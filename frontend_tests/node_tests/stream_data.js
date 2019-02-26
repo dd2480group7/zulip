@@ -313,7 +313,7 @@ run_test('is_active', () => {
 });
 
 run_test('admin_options', () => {
-    make_sub = () => {
+    const make_sub = () => {
         const sub = {
             subscribed: false,
             color: 'blue',
@@ -622,7 +622,7 @@ run_test('create_sub', () => {
 });
 
 run_test('initialize', () => {
-    initialize = () => {
+    const initialize = () => {
         page_params.subscriptions = [{
             name: 'subscriptions',
             stream_id: '2001',
