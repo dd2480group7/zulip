@@ -8,14 +8,14 @@ const { window } = new JSDOM();
 global.$ = require('jquery')(window);
 
 // When writing these tests, the following command might be helpful:
-// ./tools/get-handlebar-vars static/templates/*.handlebars
+// ./tools/get-handlebar-lets static/templates/*.handlebars
 
 function render(template_name, args) {
     return global.render_template(template_name, args);
 }
 
 run_test('finding_partials', () => {
-    var fns = global.find_included_partials('settings_tab');
+    let fns = global.find_included_partials('settings_tab');
     assert.deepEqual(fns, [
         'account-settings',
         'display-settings',
@@ -23,7 +23,7 @@ run_test('finding_partials', () => {
         'bot-settings',
         'alert-word-settings',
         'attachments-settings',
-        'muted-topics-settings',
+        'muted-topics-settings', 
     ]);
 });
 
@@ -31,7 +31,7 @@ run_test('handlebars_bug', () => {
     // There was a bug in 1.0.9 where identically structured
     // blocks get confused, so when foo is false, it still
     // renders the foo-is-true block.
-    var s = '';
+    let s = '';
     s += '{{#if foo}}';
     s += '{{#if bar}}';
     s += 'a';
@@ -45,44 +45,44 @@ run_test('handlebars_bug', () => {
     s += 'd';
     s += '{{/if}}';
     s += '{{/if}}';
-    var template = global.Handlebars.compile(s);
-    var output = template({});
+    const template = global.Handlebars.compile(s);
+    const output = template({});
 
     assert.equal(output, 'd'); // the buggy version would return 'b'
 });
 
 run_test('actions_popover_content', () => {
-    var args = {
+    let args = {
         should_display_quote_and_reply: true,
         can_edit_message: true,
         can_mute_topic: true,
         narrowed: true,
     };
 
-    var html = '<div style="height: 250px">';
+    let html = '<div style="height: 250px">';
     html += render('actions_popover_content', args);
     html += "</div>";
-    var link = $(html).find("a.respond_button");
+    let link = $(html).find("a.respond_button");
     assert.equal(link.text().trim(), 'translated: Quote and reply');
 
-    var deletedArgs = {
+    let deletedArgs = {
         should_display_edit_and_view_source: false,
         should_display_quote_and_reply: false,
         narrowed: true,
     };
 
-    var deletedHtml = '<div style="height: 250px">';
+    let deletedHtml = '<div style="height: 250px">';
     deletedHtml += render('actions_popover_content', deletedArgs);
     deletedHtml += "</div>";
-    var viewSourceLink = $(deletedHtml).find("a.popover_edit_message");
+    const viewSourceLink = $(deletedHtml).find("a.popover_edit_message");
     assert.equal(viewSourceLink.length, 0);
-    var quoteLink = $(deletedHtml).find("a.respond_button");
+    const quoteLink = $(deletedHtml).find("a.respond_button");
     assert.equal(quoteLink.length, 0);
 });
 
 run_test('admin_realm_domains_list', () => {
-    var html = "<table>";
-    var args = {
+    let html = "<table>";
+    let args = {
         realm_domain: {
             domain: 'zulip.org',
             allow_subdomains: true,
@@ -91,10 +91,10 @@ run_test('admin_realm_domains_list', () => {
     html += render("admin-realm-domains-list", args);
     html += "</table>";
 
-    var button = $(html).find('.button');
-    var domain = $(html).find('.domain');
-    var row = button.closest('tr');
-    var subdomains_checkbox = row.find('.allow-subdomains');
+    const button = $(html).find('.button');
+    const domain = $(html).find('.domain');
+    const row = button.closest('tr');
+    const subdomains_checkbox = row.find('.allow-subdomains');
 
     assert.equal(button.text().trim(), "translated: Remove");
     assert(button.hasClass("delete_realm_domain"));
@@ -104,8 +104,8 @@ run_test('admin_realm_domains_list', () => {
 });
 
 run_test('admin_realm_dropdown_stream_list', () => {
-    var html = "<ul>";
-    var args = {
+    let html = "<ul>";
+    let args = {
         stream: {
             name: "Italy",
             subscriber_count: 9,
@@ -115,8 +115,8 @@ run_test('admin_realm_dropdown_stream_list', () => {
     html += render("admin-realm-dropdown-stream-list", args);
     html += "</ul>";
 
-    var link = $(html).find("a");
-    var list_item = $(html).find("li");
+    let link = $(html).find("a");
+    let list_item = $(html).find("li");
 
     assert.equal(link.text().trim(), "Italy");
     assert(list_item.hasClass("stream_name"));
@@ -124,25 +124,25 @@ run_test('admin_realm_dropdown_stream_list', () => {
 });
 
 run_test('admin_default_streams_list', () => {
-    var html = '<table>';
-    var streams = ['devel', 'trac', 'zulip'];
+    let html = '<table>';
+    let streams = ['devel', 'trac', 'zulip'];
 
     // When the logged in user is admin
     _.each(streams, function (stream) {
-        var args = {
+        let args = {
             stream: {name: stream, invite_only: false},
             can_modify: true,
         };
         html += render('admin_default_streams_list', args);
     });
     html += "</table>";
-    var span = $(html).find(".default_stream_name:first");
+    let span = $(html).find(".default_stream_name:first");
     assert.equal(span.text(), "devel");
 
     // When the logged in user is not admin
     html = '<table>';
     _.each(streams, function (stream) {
-        var args = {
+        let args = {
             stream: {name: stream, invite_only: false},
             can_modify: false,
         };
@@ -154,7 +154,7 @@ run_test('admin_default_streams_list', () => {
 });
 
 run_test('admin_emoji_list', () => {
-    var args = {
+    let args = {
         emoji: {
             name: "MouseFace",
             display_name: "MouseFace",
@@ -162,13 +162,13 @@ run_test('admin_emoji_list', () => {
         },
     };
 
-    var html = '';
+    let html = '';
     html += '<tbody id="admin_emoji_table">';
     html += render('admin_emoji_list', args);
     html += '</tbody>';
 
-    var emoji_name = $(html).find('tr.emoji_row:first span.emoji_name');
-    var emoji_url = $(html).find('tr.emoji_row:first span.emoji_image img');
+    let emoji_name = $(html).find('tr.emoji_row:first span.emoji_name');
+    let emoji_url = $(html).find('tr.emoji_row:first span.emoji_image img');
 
     assert.equal(emoji_name.text(), 'MouseFace');
     assert.equal(emoji_url.attr('src'), 'http://emojipedia-us.s3.amazonaws.com/cache/46/7f/467fe69069c408e07517621f263ea9b5.png');
@@ -177,7 +177,7 @@ run_test('admin_emoji_list', () => {
 run_test('admin_profile_field_list', () => {
 
     // When the logged in user is admin
-    var args = {
+    let args = {
         profile_field: {
             name: "teams",
             type: "Long text",
@@ -185,14 +185,14 @@ run_test('admin_profile_field_list', () => {
         can_modify: true,
     };
 
-    var html = '';
+    let html = '';
     html += '<tbody id="admin_profile_fields_table">';
     html += render('admin_profile_field_list', args);
     html += '</tbody>';
 
-    var field_name = $(html).find('tr.profile-field-row:first span.profile_field_name');
-    var field_type = $(html).find('tr.profile-field-row:first span.profile_field_type');
-    var td = $(html).find('tr.profile-field-row:first td');
+    let field_name = $(html).find('tr.profile-field-row:first span.profile_field_name');
+    let field_type = $(html).find('tr.profile-field-row:first span.profile_field_type');
+    let td = $(html).find('tr.profile-field-row:first td');
 
     assert.equal(field_name.text(), 'teams');
     assert.equal(field_type.text(), 'Long text');
@@ -224,7 +224,7 @@ run_test('admin_profile_field_list', () => {
 run_test('admin_filter_list', () => {
 
     // When the logged in user is admin
-    var args = {
+    let args = {
         filter: {
             pattern: "#(?P<id>[0-9]+)",
             url_format_string: "https://trac.example.com/ticket/%(id)s",
@@ -232,13 +232,13 @@ run_test('admin_filter_list', () => {
         can_modify: true,
     };
 
-    var html = '';
+    let html = '';
     html += '<tbody id="admin_filters_table">';
     html += render('admin_filter_list', args);
     html += '</tbody>';
 
-    var filter_pattern = $(html).find('tr.filter_row:first span.filter_pattern');
-    var filter_format = $(html).find('tr.filter_row:first span.filter_url_format_string');
+    let filter_pattern = $(html).find('tr.filter_row:first span.filter_pattern');
+    let filter_format = $(html).find('tr.filter_row:first span.filter_url_format_string');
 
     assert.equal(filter_pattern.text(), '#(?P<id>[0-9]+)');
     assert.equal(filter_format.text(), 'https://trac.example.com/ticket/%(id)s');
@@ -265,11 +265,11 @@ run_test('admin_filter_list', () => {
 });
 
 run_test('admin_invites_list', () => {
-    var html = '<table>';
-    var invites = ['alice', 'bob', 'carl'];
-    var invite_id = 0;
+    let html = '<table>';
+    let invites = ['alice', 'bob', 'carl'];
+    let invite_id = 0;
     _.each(invites, function (invite) {
-        var args = {
+        let args = {
             invite: {
                 email: invite + '@zulip.com',
                 ref: 'iago@zulip.com',
@@ -282,7 +282,7 @@ run_test('admin_invites_list', () => {
         invite_id += 1;
     });
     html += "</table>";
-    var buttons = $(html).find('.button');
+    let buttons = $(html).find('.button');
 
     assert.equal($(buttons[0]).text().trim(), "translated: Revoke");
     assert($(buttons[0]).hasClass("revoke"));
@@ -292,16 +292,16 @@ run_test('admin_invites_list', () => {
     assert($(buttons[3]).hasClass("resend"));
     assert.equal($(buttons[3]).attr("data-invite-id"), 1);
 
-    var span = $(html).find(".email:first");
+    let span = $(html).find(".email:first");
     assert.equal(span.text(), "alice@zulip.com");
 });
 
 run_test('admin_tab', () => {
-    var args = {
+    let args = {
         realm_name: 'Zulip',
     };
-    var html = render('admin_tab', args);
-    var admin_features = ["admin_users_table", "admin_bots_table",
+    let html = render('admin_tab', args);
+    let admin_features = ["admin_users_table", "admin_bots_table",
                           "admin_deactivated_users_table", "admin_invites_table"];
     _.each(admin_features, function (admin_feature) {
         assert.notEqual($(html).find("#" + admin_feature).length, 0);
@@ -310,7 +310,7 @@ run_test('admin_tab', () => {
 });
 
 run_test('admin_user_group_list', () => {
-    var args = {
+    let args = {
         user_group: {
             id: "9",
             name: "uranohoshi",
@@ -318,15 +318,15 @@ run_test('admin_user_group_list', () => {
         },
     };
 
-    var html = '';
+    let html = '';
     html += '<div id="user-groups">';
     html += render('admin_user_group_list', args);
     html += '</div>';
 
-    var group_id = $(html).find('.user-group:first').prop('id');
-    var group_pills_id = $(html).find('.user-group:first .pill-container').attr('data-group-pills');
-    var group_name_display = $(html).find('.user-group:first .name').text().trim().replace(/\s+/g, ' ');
-    var group_description = $(html).find('.user-group:first .description').text().trim().replace(/\s+/g, ' ');
+    let group_id = $(html).find('.user-group:first').prop('id');
+    let group_pills_id = $(html).find('.user-group:first .pill-container').attr('data-group-pills');
+    let group_name_display = $(html).find('.user-group:first .name').text().trim().replace(/\s+/g, ' ');
+    let group_description = $(html).find('.user-group:first .description').text().trim().replace(/\s+/g, ' ');
 
     assert.equal(group_id, '9');
     assert.equal(group_pills_id, '9');
@@ -335,12 +335,12 @@ run_test('admin_user_group_list', () => {
 });
 
 run_test('admin_user_list', () => {
-    var html = '<table>';
-    var users = ['alice', 'bob', 'carl'];
+    let html = '<table>';
+    let users = ['alice', 'bob', 'carl'];
 
     // When the logged in user is admin
     _.each(users, function (user) {
-        var args = {
+        let args = {
             user: {
                 is_active: true,
                 is_active_human: true,
@@ -353,7 +353,7 @@ run_test('admin_user_list', () => {
     });
     html += "</table>";
 
-    var buttons = $(html).find('.button');
+    let buttons = $(html).find('.button');
 
     assert.equal($(buttons[0]).text().trim(), "translated: Deactivate");
     assert($(buttons[0]).hasClass("deactivate"));
@@ -364,7 +364,7 @@ run_test('admin_user_list', () => {
     // When the logged in user is not admin
     html = '<table>';
     _.each(users, function (user) {
-        var args = {
+        let args = {
             user: {
                 is_active: true,
                 is_active_human: true,
@@ -383,9 +383,9 @@ run_test('admin_user_list', () => {
 });
 
 run_test('alert_word_settings_item', () => {
-    var html = '<ul id="alert-words">';
-    var words = ['lunch', 'support'];
-    var args;
+    let html = '<ul id="alert-words">';
+    let words = ['lunch', 'support'];
+    let args;
     _.each(words, function (word) {
         args = {
             word: word,
@@ -399,17 +399,17 @@ run_test('alert_word_settings_item', () => {
     html += render('alert_word_settings_item', args);
     html += "</ul>";
 
-    var li = $(html).find("li.alert-word-item:first");
-    var value = li.find('.value');
-    var button = li.find('button');
+    let li = $(html).find("li.alert-word-item:first");
+    let value = li.find('.value');
+    let button = li.find('button');
     assert.equal(li.attr('data-word'), 'lunch');
     assert.equal(value.length, 1);
     assert.equal(value.text(), 'lunch');
     assert.equal(button.attr('title'), 'translated: Delete alert word');
     assert.equal(button.attr('data-word'), 'lunch');
 
-    var title = $(html).find('.new-alert-word-section-title');
-    var textbox = $(html).find('#create_alert_word_name');
+    let title = $(html).find('.new-alert-word-section-title');
+    let textbox = $(html).find('#create_alert_word_name');
     button = $(html).find('#create_alert_word_button');
     assert.equal(title.length, 1);
     assert.equal(title.text().trim(), 'translated: Add a new alert word');
@@ -431,40 +431,40 @@ run_test('announce_stream_docs', () => {
 });
 
 run_test('bankruptcy_modal', () => {
-    var args = {
+    const args = {
         unread_count: 99,
     };
-    var html = render('bankruptcy_modal', args);
-    var count = $(html).find("p b");
+    let html = render('bankruptcy_modal', args);
+    let count = $(html).find("p b");
     assert.equal(count.text(), 99);
 });
 
 run_test('admin_auth_methods_list', () => {
-    var args = {
+    let args = {
         method: {
             method: "Email",
             enabled: false,
         },
     };
 
-    var html = '';
+    let html = '';
     html += '<tbody id="admin_auth_methods_table">';
     html += render('admin_auth_methods_list', args);
     html += '</tbody>';
 
-    var method = $(html).find('tr.method_row:first span.method');
+    let method = $(html).find('tr.method_row:first span.method');
     assert.equal(method.text(), 'Email');
     assert.equal(method.is("checked"), false);
 });
 
 run_test('bookend', () => {
     // Do subscribed/unsubscribed cases here.
-    var args = {
+    let args = {
         bookend_content: "subscribed to stream",
         trailing: true,
         subscribed: true,
     };
-    var html;
+    let html;
 
     html = render('bookend', args);
     assert.equal($(html).text().trim(), "subscribed to stream\n    \n        \n            translated: Unsubscribe");
@@ -481,8 +481,8 @@ run_test('bookend', () => {
 });
 
 run_test('bot_avatar_row', () => {
-    var html = '';
-    var args = {
+    let html = '';
+    let args = {
         email: "hamlet@zulip.com",
         api_key: "123456ABCD",
         name: "Hamlet",
@@ -490,12 +490,12 @@ run_test('bot_avatar_row', () => {
     };
     html += render('bot_avatar_row', args);
 
-    var img = $(html).find("img");
+    let img = $(html).find("img");
     assert.equal(img.attr('src'), '/hamlet/avatar/url');
 });
 
 run_test('bot_owner_select', () => {
-    var args = {
+    let args = {
         users_list: [
             {
                 email: "hamlet@zulip.com",
@@ -505,21 +505,21 @@ run_test('bot_owner_select', () => {
             },
         ],
     };
-    var html = render('bot_owner_select', args);
-    var option = $(html).find("option:last");
+    let html = render('bot_owner_select', args);
+    let option = $(html).find("option:last");
     assert.equal(option.val(), "hamlet@zulip.com");
     assert.equal(option.text(), "Hamlet");
 });
 
 
 run_test('compose_invite_users', () => {
-    var args = {
+    let args = {
         email: 'hamlet@zulip.com',
         name: 'Hamlet',
         can_subscribe_other_users: true,
     };
-    var html = render('compose-invite-users', args);
-    var button = $(html).find("button:first");
+    let html = render('compose-invite-users', args);
+    let button = $(html).find("button:first");
     assert.equal(button.text(), "translated: Subscribe");
 
     args.can_subscribe_other_users = false;
@@ -529,31 +529,31 @@ run_test('compose_invite_users', () => {
 });
 
 run_test('compose_all_everyone', () => {
-    var args = {
+    let args = {
         count: '101',
         name: 'all',
     };
-    var html = render('compose_all_everyone', args);
-    var button = $(html).find("button:first");
+    let html = render('compose_all_everyone', args);
+    let button = $(html).find("button:first");
     assert.equal(button.text(), "translated: Yes, send");
-    var error_msg = $(html).find('span.compose-all-everyone-msg').text().trim();
+    let error_msg = $(html).find('span.compose-all-everyone-msg').text().trim();
     assert.equal(error_msg, "translated: Are you sure you want to mention all 101 people in this stream?");
 });
 
 run_test('compose_announce', () => {
-    var args = {
+    let args = {
         count: '101',
     };
-    var html = render('compose_announce', args);
-    var button = $(html).find("button:first");
+    let html = render('compose_announce', args);
+    let button = $(html).find("button:first");
     assert.equal(button.text(), "translated: Yes, send");
-    var error_msg = $(html).find('span.compose-announce-msg').text().trim();
+    let error_msg = $(html).find('span.compose-announce-msg').text().trim();
     assert.equal(error_msg, "translated:         This stream is reserved for announcements.\n        \n        Are you sure you want to message all 101 people in this stream?");
 });
 
 run_test('compose_not_subscribed', () => {
-    var html = render('compose_not_subscribed', {should_display_sub_button: true});
-    var button = $(html).find("button:first");
+    let html = render('compose_not_subscribed', {should_display_sub_button: true});
+    let button = $(html).find("button:first");
     assert.equal(button.text(), "translated: Subscribe");
     html = render('compose_not_subscribed', {should_display_sub_button: false});
     button = $(html).find("button:first");
@@ -561,35 +561,35 @@ run_test('compose_not_subscribed', () => {
 });
 
 run_test('compose_notification', () => {
-    var args = {
+    let args = {
         note: "You sent a message to a muted topic.",
         link_text: "Narrow to here",
         link_msg_id: "99",
         link_class: "compose_notification_narrow_by_topic",
     };
-    var html = '<div  id="out-of-view-notification" class="notification-alert">';
+    let html = '<div  id="out-of-view-notification" class="notification-alert">';
     html += render('compose_notification', args);
     html += '</div>';
-    var a = $(html).find("a.compose_notification_narrow_by_topic");
+    let a = $(html).find("a.compose_notification_narrow_by_topic");
     assert.equal(a.text(), "Narrow to here");
 });
 
 run_test('compose_private_stream_alert', () => {
-    var args = {
+    let args = {
         stream_name: 'Denmark',
     };
-    var html = render('compose_private_stream_alert', args);
+    let html = render('compose_private_stream_alert', args);
     assert($(html).hasClass('compose_private_stream_alert'));
 
-    var actual_text = $(html).text();
-    var expected_text = 'translated: Warning: Denmark is a private stream.';
-    assert(actual_text.indexOf(expected_text) >= 1);
+    let actual_text = $(html).text();
+    let expected_text = 'translated: Warning: Denmark is a private stream.';
+    assert(actual_text.includes(expected_text));
 });
 
 run_test('custom_user_profile_field', () => {
-    var field = {name: "GitHub user name", id: 2, hint: "Or link to profile"};
-    var args = {field: field, field_value: {value: "@GitHub", rendered_value: "<p>@GitHub</p>"}, field_type: "text"};
-    var html = render('custom-user-profile-field', args);
+    let field = {name: "GitHub user name", id: 2, hint: "Or link to profile"};
+    let args = {field: field, field_value: {value: "@GitHub", rendered_value: "<p>@GitHub</p>"}, field_type: "text"};
+    let html = render('custom-user-profile-field', args);
     assert.equal($(html).attr('data-field-id'), 2);
     assert.equal($(html).find('.custom_user_field_value').val(), "@GitHub");
     assert.equal($(html).find('.field_hint').text(), "Or link to profile");
@@ -597,15 +597,15 @@ run_test('custom_user_profile_field', () => {
 });
 
 run_test('deactivate_stream_modal', () => {
-    var args = {
+    let args = {
         stream_name: "Public stream",
     };
-    var html = render('deactivation-stream-modal', args);
+    let html = render('deactivation-stream-modal', args);
 
-    var modal_header = $(html).find("#deactivation_stream_modal_label");
+    let modal_header = $(html).find("#deactivation_stream_modal_label");
     assert.equal(modal_header.text(), "translated: Delete stream " + args.stream_name);
 
-    var button = $(html).find("#do_deactivate_stream_button");
+    let button = $(html).find("#do_deactivate_stream_button");
     assert.equal(button.text(), "translated: Yes, delete this stream");
 });
 
@@ -614,7 +614,7 @@ run_test('dev_env_email_access', () => {
 });
 
 run_test('draft_table_body', () => {
-    var args = {
+    let args = {
         drafts: [
             {
                 draft_id: '1',
@@ -633,19 +633,19 @@ run_test('draft_table_body', () => {
         ],
     };
 
-    var html = '';
+    let html = '';
     html += '<div id="drafts_table">';
     html += render('draft_table_body', args);
     html += '</div>';
 
-    var row_1 = $(html).find(".draft-row[data-draft-id='1']");
+    let row_1 = $(html).find(".draft-row[data-draft-id='1']");
     assert.equal(row_1.find(".stream_label").text().trim(), "all");
     assert.equal(row_1.find(".stream_label").css("background"), "rgb(255, 0, 0)");
     assert.equal(row_1.find(".stream_topic").text().trim(), "tests");
     assert(!row_1.find(".message_row").hasClass("private-message"));
     assert.equal(row_1.find(".message_content").text().trim(), "Public draft");
 
-    var row_2 = $(html).find(".draft-row[data-draft-id='2']");
+    let row_2 = $(html).find(".draft-row[data-draft-id='2']");
     assert.equal(row_2.find(".stream_label").text().trim(), "translated: You and Jordan, Michael");
     assert(row_2.find(".message_row").hasClass("private-message"));
     assert.equal(row_2.find(".message_content").text().trim(), "Private draft");
@@ -653,24 +653,24 @@ run_test('draft_table_body', () => {
 
 
 run_test('email_address_hint', () => {
-    var html = render('email_address_hint');
-    var li = $(html).find("li:first");
+    let html = render('email_address_hint');
+    let li = $(html).find("li:first");
     assert.equal(li.text(), 'translated: The email will be forwarded to this stream');
 });
 
 run_test('emoji_popover', () => {
-    var args = {
+    let args = {
         class: "emoji-info-popover",
     };
-    var html = "<div>";
+    let html = "<div>";
     html += render('emoji_popover', args);
     html += "</div>";
-    var popover = $(html).find(".popover");
+    let popover = $(html).find(".popover");
     assert(popover.hasClass("emoji-info-popover"));
 });
 
 run_test('emoji_popover_content', () => {
-    var args = {
+    let args = {
         search: 'Search',
         message_id: 1,
         emoji_categories: [
@@ -699,22 +699,22 @@ run_test('emoji_popover_content', () => {
         ],
     };
 
-    var html = '<div style="height: 250px">';
+    let html = '<div style="height: 250px">';
     html += render('emoji_popover_content', args);
     html += "</div>";
     // test to make sure the first emoji is present in the popover
-    var first_emoji = $(html).find(".emoji-100");
+    let first_emoji = $(html).find(".emoji-100");
     assert.equal(first_emoji.length, 1);
 
-    var categories = $(html).find(".emoji-popover-tab-item");
+    let categories = $(html).find(".emoji-popover-tab-item");
     assert.equal(categories.length, 2);
 
-    var category_1 = $(html).find(".emoji-popover-tab-item[data-tab-name = 'Test']");
+    let category_1 = $(html).find(".emoji-popover-tab-item[data-tab-name = 'Test']");
     assert(category_1.hasClass("active"));
 });
 
 run_test('emoji_popover_search_results', () => {
-    var args = {
+    let args = {
         message_id: 1,
         search_results: [
             {
@@ -731,16 +731,16 @@ run_test('emoji_popover_search_results', () => {
             },
         ],
     };
-    var html = "<div>";
+    let html = "<div>";
     html += render("emoji_popover_search_results", args);
     html += "</div>";
-    var used_emoji = $(html).find(".emoji-test-2").parent();
+    let used_emoji = $(html).find(".emoji-test-2").parent();
     assert(used_emoji.hasClass("reaction"));
     assert(used_emoji.hasClass("reacted"));
 });
 
 run_test('emoji_showcase', () => {
-    var args = {
+    let args = {
         emoji_dict: {
             name: "thumbs_up",
             is_realm_emoji: false,
@@ -748,9 +748,9 @@ run_test('emoji_showcase', () => {
             has_reacted: false,
         },
     };
-    var html = render("emoji_showcase", args);
-    var emoji_div = $(html).find(".emoji");
-    var canonical_name = $(html).find(".emoji-canonical-name");
+    let html = render("emoji_showcase", args);
+    let emoji_div = $(html).find(".emoji");
+    let canonical_name = $(html).find(".emoji-canonical-name");
 
     assert.equal(emoji_div.length, 1);
     assert(emoji_div.hasClass("emoji-1f44d"));
@@ -759,7 +759,7 @@ run_test('emoji_showcase', () => {
 });
 
 run_test('group_pms', () => {
-    var args = {
+    let args = {
         group_pms: [
             {
                 fraction_present: 0.1,
@@ -769,20 +769,20 @@ run_test('group_pms', () => {
             },
         ],
     };
-    var html = render('group_pms', args);
+    let html = render('group_pms', args);
 
-    var a = $(html).find("a:first");
+    let a = $(html).find("a:first");
     assert.equal(a.text(), 'Alice and Bob');
 });
 
 run_test('hotspot_overlay', () => {
-    var args = {
+    let args = {
         title: 'Start a new conversation',
         name: 'intro_compose',
         description: 'Click the "New topic" button to start a new conversation.',
     };
 
-    var html = render('hotspot_overlay', args);
+    let html = render('hotspot_overlay', args);
 
     assert.equal($(html).attr('id'), 'hotspot_intro_compose_overlay');
     assert.equal($(html).find('.hotspot-title').text(), 'Start a new conversation');
@@ -793,24 +793,24 @@ run_test('hotspot_overlay', () => {
 });
 
 run_test('input_pill', () => {
-    var args = {
+    let args = {
         id: 22,
         display_value: 'King Hamlet',
     };
 
-    var html = render('input_pill', args);
+    let html = render('input_pill', args);
 
     assert($(html).hasClass('pill'));
 });
 
 run_test('intro_reply_hotspot', () => {
-    var html = render('intro_reply_hotspot', {});
+    let html = render('intro_reply_hotspot', {});
 
     assert($(html).hasClass('hotspot-message'));
 });
 
 run_test('invite_subscription', () => {
-    var args = {
+    let args = {
         streams: [
             {
                 name: "devel",
@@ -820,14 +820,14 @@ run_test('invite_subscription', () => {
             },
         ],
     };
-    var html = render('invite_subscription', args);
+    let html = render('invite_subscription', args);
 
-    var input = $(html).find("label:first");
+    let input = $(html).find("label:first");
     assert.equal(input.text().trim(), "devel");
 });
 
 run_test('single_message', () => {
-    var message =  {
+    let message =  {
         msg: {
             include_recipient: true,
             display_recipient: 'devel',
@@ -839,32 +839,32 @@ run_test('single_message', () => {
         },
     };
 
-    var html = render('single_message', message);
+    let html = render('single_message', message);
     html = '<div class="message_table focused_table" id="zfilt">' + html + '</div>';
 
-    var first_message = $(html).find("div.messagebox:first");
+    let first_message = $(html).find("div.messagebox:first");
 
-    var first_message_text = first_message.find(".message_content").text().trim();
+    let first_message_text = first_message.find(".message_content").text().trim();
     assert.equal(first_message_text, "This is message one.");
 
-    var starred_title = first_message.find(".star").attr("title");
+    let starred_title = first_message.find(".star").attr("title");
     assert.equal(starred_title, "translated: Unstar this message (*)");
 });
 
 run_test('message_edit_form', () => {
-    var args = {
+    let args = {
         topic: "lunch",
         content: "Let's go to lunch!",
         is_stream: true,
     };
-    var html = render('message_edit_form', args);
+    let html = render('message_edit_form', args);
 
-    var textarea = $(html).find("textarea.message_edit_content");
+    let textarea = $(html).find("textarea.message_edit_content");
     assert.equal(textarea.text(), "Let's go to lunch!");
 });
 
 run_test('message_group', () => {
-    var messages = [
+    let messages = [
         {
             msg: {
                 id: 1,
@@ -888,7 +888,7 @@ run_test('message_group', () => {
         },
     ];
 
-    var groups = [
+    let groups = [
         {
             display_recipient: "support",
             is_stream: true,
@@ -901,20 +901,20 @@ run_test('message_group', () => {
     ];
 
     render('loader');
-    var html = render('message_group', {message_groups: groups, use_match_properties: true});
+    let html = render('message_group', {message_groups: groups, use_match_properties: true});
 
-    var first_message_text = $(html).next('.recipient_row').find('div.messagebox:first .message_content').text().trim();
+    let first_message_text = $(html).next('.recipient_row').find('div.messagebox:first .message_content').text().trim();
     assert.equal(first_message_text, "This is message one.");
 
-    var last_message_html = $(html).next('.recipient_row').find('div.messagebox:last .message_content').html().trim();
+    let last_message_html = $(html).next('.recipient_row').find('div.messagebox:last .message_content').html().trim();
     assert.equal(last_message_html, 'This is message <span class="highlight">two</span>.');
 
-    var highlighted_topic_word = $(html).find('a.narrows_by_topic .highlight').text();
+    let highlighted_topic_word = $(html).find('a.narrows_by_topic .highlight').text();
     assert.equal(highlighted_topic_word, 'two');
 });
 
 run_test('message_edit_history', () => {
-    var message = {
+    let message = {
         content: "Let's go to lunch!",
         edit_history: [
             {
@@ -928,16 +928,16 @@ run_test('message_edit_history', () => {
             },
         ],
     };
-    var html = render('message_edit_history', {
+    let html = render('message_edit_history', {
         edited_messages: message.edit_history,
     });
-    var edited_message = $(html).find("div.messagebox-content");
+    let edited_message = $(html).find("div.messagebox-content");
     assert.equal(edited_message.text().trim(),
                  "1468132659\n            Let\'s go to lunchdinner!\n            Edited by Alice");
 });
 
 run_test('message_reaction', () => {
-    var args = {
+    let args = {
         class: 'message_reaction',
         emoji_name: 'smile',
         emoji_code: '1f604',
@@ -945,24 +945,24 @@ run_test('message_reaction', () => {
         message_id: '1',
     };
 
-    var html = '';
+    let html = '';
     html += '<div>';
     html += render('message_reaction', args);
     html += '</div>';
 
-    var reaction = $(html).find(".message_reaction");
+    let reaction = $(html).find(".message_reaction");
     assert.equal(reaction.data("reaction-id"), "unicode_emoji,smile,1f604");
     assert(reaction.find(".emoji").hasClass("emoji-1f604"));
 });
 
 run_test('more_topics', () => {
-    var html = render('more_topics');
+    let html = render('more_topics');
 
     assert($(html).hasClass('show-more-topics'));
 });
 
 run_test('new_stream_users', () => {
-    var args = {
+    let args = {
         users: [
             {
                 email: 'lear@zulip.com',
@@ -975,14 +975,14 @@ run_test('new_stream_users', () => {
         ],
     };
 
-    var html = render('new_stream_users', args);
+    let html = render('new_stream_users', args);
 
-    var label = $(html).find("label:first");
+    let label = $(html).find("label:first");
     assert.equal(label.text().trim(), 'King Lear (lear@zulip.com)');
 });
 
 run_test('non_editable_user_group', () => {
-    var args = {
+    let args = {
         user_group: {
             id: "9",
             name: "uranohoshi",
@@ -990,15 +990,15 @@ run_test('non_editable_user_group', () => {
         },
     };
 
-    var html = '';
+    let html = '';
     html += '<div id="user-groups">';
     html += render('non_editable_user_group', args);
     html += '</div>';
 
-    var group_id = $(html).find('.user-group:first').prop('id');
-    var group_pills_id = $(html).find('.user-group:first .pill-container').attr('data-group-pills');
-    var group_name_display = $(html).find('.user-group:first .name').text().trim().replace(/\s+/g, ' ');
-    var group_description = $(html).find('.user-group:first .description').text().trim().replace(/\s+/g, ' ');
+    let group_id = $(html).find('.user-group:first').prop('id');
+    let group_pills_id = $(html).find('.user-group:first .pill-container').attr('data-group-pills');
+    let group_name_display = $(html).find('.user-group:first .name').text().trim().replace(/\s+/g, ' ');
+    let group_description = $(html).find('.user-group:first .description').text().trim().replace(/\s+/g, ' ');
 
     assert.equal(group_id, '9');
     assert.equal(group_pills_id, '9');
@@ -1007,28 +1007,28 @@ run_test('non_editable_user_group', () => {
 });
 
 run_test('notification', () => {
-    var args = {
+    let args = {
         content: "Hello",
         gravatar_url: "/gravatar/url",
         title: "You have a notification",
     };
 
-    var html = render('notification', args);
+    let html = render('notification', args);
 
-    var title = $(html).find(".title");
+    let title = $(html).find(".title");
     assert.equal(title.text().trim(), 'You have a notification');
 });
 
 run_test('propagate_notification_change', () => {
-    var html = render('propagate_notification_change');
+    let html = render('propagate_notification_change');
 
-    var button_area = $(html).find(".propagate-notifications-controls");
+    let button_area = $(html).find(".propagate-notifications-controls");
     assert.equal(button_area.find(".yes_propagate_notifications").text().trim(), 'translated: Yes');
     assert.equal(button_area.find(".no_propagate_notifications").text().trim(), 'translated: No');
 });
 
 run_test('reminder_popover_content', () => {
-    var args = {
+    let args = {
         message: {
             is_stream: true,
             id: "420",
@@ -1040,27 +1040,27 @@ run_test('reminder_popover_content', () => {
         narrowed: true,
     };
 
-    var html = '<div style="height: 250px">';
+    let html = '<div style="height: 250px">';
     html += render('remind_me_popover_content', args);
     html += "</div>";
-    var link = $(html).find("a.remind.custom");
+    let link = $(html).find("a.remind.custom");
     assert.equal(link.text().trim(), 'translated: Select date and time');
 });
 
 run_test('revoke_invite_modal', () => {
-    var args = {
+    let args = {
         is_multiuse: false,
         email: "iago@zulip.com",
     };
 
-    var html = "<div>";
+    let html = "<div>";
     html += render('revoke-invite-modal', args);
     html += "</div>";
     assert.equal($(html).find("p strong").text(), "iago@zulip.com");
 });
 
 run_test('settings_tab', () => {
-    var page_param_checkbox_options = {
+    let page_param_checkbox_options = {
         enable_stream_desktop_notifications: true,
         enable_stream_push_notifications: true,
         enable_stream_sounds: true, enable_desktop_notifications: true,
@@ -1070,12 +1070,12 @@ run_test('settings_tab', () => {
         realm_name_in_notifications: true,
         realm_push_notifications_enabled: true,
     };
-    var page_params = $.extend(page_param_checkbox_options, {
+    let page_params = $.extend(page_param_checkbox_options, {
         full_name: "Alyssa P. Hacker", password_auth_enabled: true,
         avatar_url: "https://google.com",
     });
 
-    var checkbox_ids = ["enable_stream_desktop_notifications",
+    let checkbox_ids = ["enable_stream_desktop_notifications",
                         "enable_stream_push_notifications",
                         "enable_stream_sounds", "enable_desktop_notifications",
                         "enable_sounds", "enable_offline_push_notifications",
@@ -1084,7 +1084,7 @@ run_test('settings_tab', () => {
                         "realm_name_in_notifications"];
 
     // Render with all booleans set to true.
-    var html = render('settings_tab', {page_params: page_params});
+    let html = render('settings_tab', {page_params: page_params});
 
     // All checkboxes should be checked.
     _.each(checkbox_ids, function (checkbox) {
@@ -1104,7 +1104,7 @@ run_test('settings_tab', () => {
     });
 
     // Check if enable_desktop_notifications setting disables subsetting too.
-    var parent_elem = $('#pm_content_in_desktop_notifications_label').wrap("<div></div>");
+    let parent_elem = $('#pm_content_in_desktop_notifications_label').wrap("<div></div>");
 
     $('#enable_desktop_notifications').prop('checked', false).triggerHandler('change');
     $('#enable_desktop_notifications').change(function () {
@@ -1121,7 +1121,7 @@ run_test('settings_tab', () => {
 });
 
 run_test('sidebar_private_message_list', () => {
-    var args = {
+    let args = {
         want_show_more_messages_links: true,
         messages: [
             {
@@ -1130,20 +1130,20 @@ run_test('sidebar_private_message_list', () => {
         ],
     };
 
-    var html = '';
+    let html = '';
     html += render('sidebar_private_message_list', args);
 
-    var conversations = $(html).find('a').text().trim().split('\n');
+    let conversations = $(html).find('a').text().trim().split('\n');
     assert.equal(conversations[0], 'alice,bob');
     assert.equal(conversations[1].trim(), '(translated: more conversations)');
 });
 
 run_test('stream_member_list_entry', () => {
-    var everyone_items = ["subscriber-name", "subscriber-email"];
-    var admin_items = ["remove-subscriber-button"];
+    let everyone_items = ["subscriber-name", "subscriber-email"];
+    let admin_items = ["remove-subscriber-button"];
 
     // First, as non-admin.
-    var html = render('stream_member_list_entry',
+    let html = render('stream_member_list_entry',
                       {name: "King Hamlet", email: "hamlet@zulip.com"});
     _.each(everyone_items, function (item) {
         assert.equal($(html).find("." + item).length, 1);
@@ -1165,7 +1165,7 @@ run_test('stream_member_list_entry', () => {
 });
 
 run_test('stream_sidebar_actions', () => {
-    var args = {
+    let args = {
         stream: {
             color: 'red',
             name: 'devel',
@@ -1174,14 +1174,14 @@ run_test('stream_sidebar_actions', () => {
         },
     };
 
-    var html = render('stream_sidebar_actions', args);
+    let html = render('stream_sidebar_actions', args);
 
-    var li = $(html).find("li:first");
+    let li = $(html).find("li:first");
     assert.equal(li.text().trim(), 'translated: Stream settings');
 });
 
 run_test('stream_sidebar_row', () => {
-    var args = {
+    let args = {
         name: "devel",
         color: "red",
         dark_background: "maroon",
@@ -1189,11 +1189,11 @@ run_test('stream_sidebar_row', () => {
         id: 999,
     };
 
-    var html = '<ul id="stream_filters">';
+    let html = '<ul id="stream_filters">';
     html += render('stream_sidebar_row', args);
     html += '</ul>';
 
-    var swatch = $(html).find(".stream-privacy");
+    let swatch = $(html).find(".stream-privacy");
     assert.equal(swatch.attr('id'), 'stream_sidebar_privacy_swatch_999');
 
     // test to ensure that the hashtag element from stream_privacy exists.
@@ -1201,14 +1201,14 @@ run_test('stream_sidebar_row', () => {
 });
 
 run_test('subscription_invites_warning_modal', () => {
-    var html = render('subscription_invites_warning_modal');
+    let html = render('subscription_invites_warning_modal');
 
-    var button = $(html).find(".close-invites-warning-modal").last();
+    let button = $(html).find(".close-invites-warning-modal").last();
     assert.equal(button.text(), 'translated: Go back');
 });
 
 run_test('subscription_settings', () => {
-    var sub = {
+    let sub = {
         name: 'devel',
         subscribed: true,
         notifications: true,
@@ -1222,34 +1222,34 @@ run_test('subscription_settings', () => {
         in_home_view: true,
     };
 
-    var html = '';
+    let html = '';
     html += render('subscription_settings', sub);
 
-    var div = $(html).find(".subscription-type");
-    assert(div.text().indexOf('private stream') > 0);
+    let div = $(html).find(".subscription-type");
+    assert(div.text().includes('private stream'));
 
-    var anchor = $(html).find(".change-stream-privacy:first");
+    let anchor = $(html).find(".change-stream-privacy:first");
     assert.equal(anchor.text(), "[translated: Change]");
 });
 
 
 run_test('subscription_stream_privacy_modal', () => {
-    var args = {
+    let args = {
         stream_id: 999,
         is_private: true,
         is_admin: true,
     };
-    var html = render('subscription_stream_privacy_modal', args);
+    let html = render('subscription_stream_privacy_modal', args);
 
-    var other_options = $(html).find("input[name=privacy]");
+    let other_options = $(html).find("input[name=privacy]");
     assert.equal(other_options[0].value, 'public');
     assert.equal(other_options[1].value, 'invite-only-public-history');
     assert.equal(other_options[2].value, 'invite-only');
 
-    var is_announcement_only = $(html).find("input[name=is-announcement-only]");
+    let is_announcement_only = $(html).find("input[name=is-announcement-only]");
     assert.equal(is_announcement_only.prop('checked'), false);
 
-    var button = $(html).find("#change-stream-privacy-button");
+    let button = $(html).find("#change-stream-privacy-button");
     assert(button.hasClass("btn-danger"));
     assert.equal(button.text().trim(), "translated: Save changes");
 });
@@ -1264,7 +1264,7 @@ run_test('subscription_table_body', () => {
 
 
 run_test('subscriptions', () => {
-    var args = {
+    let args = {
         subscriptions: [
             {
                 name: 'devel',
@@ -1286,18 +1286,18 @@ run_test('subscriptions', () => {
         ],
     };
 
-    var html = '';
+    let html = '';
     html += '<div>';
     html += render('subscriptions', args);
     html += '</div>';
 
-    var span = $(html).find(".stream-name:first");
+    let span = $(html).find(".stream-name:first");
     assert.equal(span.text(), 'devel');
 });
 
 
 run_test('tab_bar', () => {
-    var args = {
+    let args = {
         tabs: [
             {
                 cls: 'root',
@@ -1314,46 +1314,46 @@ run_test('tab_bar', () => {
         ],
     };
 
-    var html = render('tab_bar', args);
+    let html = render('tab_bar', args);
 
-    var a = $(html).find("li:first");
+    let a = $(html).find("li:first");
     assert.equal(a.text().trim(), 'Home');
 });
 
 run_test('topic_edit_form', () => {
-    var html = render('topic_edit_form');
+    let html = render('topic_edit_form');
 
-    var button = $(html).find("button:first");
+    let button = $(html).find("button:first");
     assert.equal(button.find("i").attr("class"), 'fa fa-check');
 });
 
 run_test('topic_list_item', () => {
-    var args = {
+    let args = {
         is_muted: false,
         topic_name: 'lunch',
         url: '/lunch/url',
         unread: 5,
     };
 
-    var html = render('topic_list_item', args);
+    let html = render('topic_list_item', args);
 
     assert.equal($(html).attr('data-topic-name'), 'lunch');
 });
 
 
 run_test('topic_sidebar_actions', () => {
-    var args = {
+    let args = {
         stream_name: 'social',
         topic_name: 'lunch',
         can_mute_topic: true,
         is_admin: false,
     };
-    var html = render('topic_sidebar_actions', args);
+    let html = render('topic_sidebar_actions', args);
 
-    var a = $(html).find("a.narrow_to_topic");
+    let a = $(html).find("a.narrow_to_topic");
     assert.equal(a.text().trim(), 'translated: Narrow to topic lunch');
 
-    var delete_topic_option = $(html).find("a.sidebar-popover-delete-topic-messages");
+    let delete_topic_option = $(html).find("a.sidebar-popover-delete-topic-messages");
     assert.equal(delete_topic_option.length, 0);
 
     args = {
@@ -1366,17 +1366,17 @@ run_test('topic_sidebar_actions', () => {
 });
 
 run_test('delete_topic_modal', () => {
-    var args = {
+    let args = {
         topic_name: 'lunch',
     };
-    var html = render('delete_topic_modal', args);
+    let html = render('delete_topic_modal', args);
 
-    var modal_body = $(html).find('.modal-body');
-    assert(modal_body.text().indexOf('delete all messages in lunch?') > 0);
+    let modal_body = $(html).find('.modal-body');
+    assert(modal_body.text().includes('delete all messages in lunch?'));
 });
 
 run_test('typeahead_list_item', () => {
-    var args = {
+    let args = {
         primary: 'primary-text',
         secondary: 'secondary-text',
         img_src: 'https://zulip.org',
@@ -1385,7 +1385,7 @@ run_test('typeahead_list_item', () => {
         has_secondary: true,
     };
 
-    var html = '<div>' + render('typeahead_list_item', args) + '</div>';
+    let html = '<div>' + render('typeahead_list_item', args) + '</div>';
 
     assert.equal($(html).find('.emoji').attr('src'), 'https://zulip.org');
     assert.equal($(html).find('strong').text().trim(), 'primary-text');
@@ -1393,31 +1393,31 @@ run_test('typeahead_list_item', () => {
 });
 
 run_test('typing_notifications', () => {
-    var args = {
+    let args = {
         users: [{
             full_name: 'Hamlet',
             email: 'hamlet@zulip.com',
         }],
     };
 
-    var html = '';
+    let html = '';
     html += '<ul>';
     html += render('typing_notifications', args);
     html += '</ul>';
 
-    var li = $(html).find('li:first');
+    let li = $(html).find('li:first');
     assert.equal(li.text(), 'Hamlet is typing...');
 
 });
 
 run_test('user_group_info_popover', () => {
-    var html = render('user_group_info_popover');
+    let html = render('user_group_info_popover');
 
     $(html).hasClass('popover message-info-popover group-info-popover');
 });
 
 run_test('user_group_info_popover_content', () => {
-    var args = {
+    let args = {
         group_name: 'groupName',
         group_description: 'groupDescription',
         members: [
@@ -1439,9 +1439,9 @@ run_test('user_group_info_popover_content', () => {
         ],
     };
 
-    var html = render('user_group_info_popover_content', args);
+    let html = render('user_group_info_popover_content', args);
 
-    var allUsers = $(html).find("li");
+    let allUsers = $(html).find("li");
     assert.equal($(allUsers[0]).text().trim(), 'Active Alice');
     assert.equal($(allUsers[1]).text().trim(), 'Bot Bob');
     assert.equal($(allUsers[2]).text().trim(), 'Inactive Imogen');
@@ -1451,13 +1451,13 @@ run_test('user_group_info_popover_content', () => {
 });
 
 run_test('no_arrow_popover', () => {
-    var html = render('no_arrow_popover', {class: 'message-info-popover'});
+    let html = render('no_arrow_popover', {class: 'message-info-popover'});
 
     $(html).hasClass('popover message-info-popover');
 });
 
 run_test('user_info_popover_content', () => {
-    var args = {
+    let args = {
         message: {
             full_date_str: 'Monday',
             full_time_str: '12:00',
@@ -1469,21 +1469,21 @@ run_test('user_info_popover_content', () => {
         private_message_class: 'compose_private_message',
     };
 
-    var html = render('user_info_popover_content', args);
+    let html = render('user_info_popover_content', args);
 
-    var a = $(html).find("a.narrow_to_private_messages");
+    let a = $(html).find("a.narrow_to_private_messages");
     assert.equal(a.text().trim(), 'translated: View private messages');
 });
 
 run_test('user_info_popover_title', () => {
-    var html = render('user_info_popover_title', {user_avatar: 'avatar/hamlet@zulip.com'});
+    let html = render('user_info_popover_title', {user_avatar: 'avatar/hamlet@zulip.com'});
 
     html = '<div>' + html + '</div>';
     assert.equal($(html).find('.popover-avatar').css('background-image'), "url(avatar/hamlet@zulip.com)");
 });
 
 run_test('uploaded_files_list_popover', () => {
-    var args = {
+    let args = {
         attachment: {
             name: "file_name.txt",
             create_time: "Apr 12 04:18 AM",
@@ -1500,7 +1500,7 @@ run_test('uploaded_files_list_popover', () => {
         },
     };
 
-    var html = render('uploaded_files_list', args);
+    let html = render('uploaded_files_list', args);
     assert.equal($(html).find('.ind-message').attr("href"), "/#narrow/id/1");
     assert.equal($(html).find('#download_attachment').attr("href"),
                  "/user_uploads/2/65/6wITdgsd63hdskjuFqEeEy7_r/file_name.txt");
@@ -1508,7 +1508,7 @@ run_test('uploaded_files_list_popover', () => {
 });
 
 run_test('user_presence_rows', () => {
-    var args = {
+    let args = {
         users: [
             {
                 type_desc: "Active",
@@ -1527,17 +1527,17 @@ run_test('user_presence_rows', () => {
         ],
     };
 
-    var html = '';
+    let html = '';
     html += '<ul class="filters">';
     html += render('user_presence_rows', args);
     html += '</ul>';
 
-    var a = $(html).find("a:first");
+    let a = $(html).find("a:first");
     assert.equal(a.text().trim(), 'King Lear');
 });
 
 run_test('user_profile_modal', () => {
-    var args = {
+    let args = {
         full_name: "Iago",
         email: "iago@zulip.com",
         profile_data: {
@@ -1546,19 +1546,19 @@ run_test('user_profile_modal', () => {
         },
     };
 
-    var html = render('user_profile_modal', args);
-    var div = $(html).find("#email .value");
+    let html = render('user_profile_modal', args);
+    let div = $(html).find("#email .value");
     assert.equal(div.text().trim(), 'iago@zulip.com');
 });
 
 run_test('muted_topic_ui_row', () => {
-    var args = {
+    let args = {
         stream: 'Verona',
         stream_id: 99,
         topic: 'pizza',
     };
 
-    var html = '<table id="muted-topics-table">';
+    let html = '<table id="muted-topics-table">';
     html += '<tbody>';
     html += render('muted_topic_ui_row', args);
     html += '</tbody>';
@@ -1569,12 +1569,12 @@ run_test('muted_topic_ui_row', () => {
 });
 
 run_test('embedded_bot_config_item', () => {
-    var args = {
+    let args = {
         botname: 'giphy',
         key: 'api_key',
         value: '12345678',
     };
-    var html = render('embedded_bot_config_item', args);
+    let html = render('embedded_bot_config_item', args);
     assert.equal($(html).attr('name'), args.botname);
     assert.equal($(html).attr('id'), args.botname + '_' + args.key);
     assert.equal($(html).find('label').text(), args.key);
@@ -1586,21 +1586,21 @@ run_test('edit_bot', () => {
 });
 
 run_test('edit_outgoing_webhook_service', () => {
-    var args = {
+    let args = {
         service: {base_url: "http://www.foo.bar",
                   interface: "1"},
     };
-    var html = render('edit-outgoing-webhook-service', args);
+    let html = render('edit-outgoing-webhook-service', args);
     assert.equal($(html).find('#edit_service_base_url').val(), args.service.base_url);
     assert.equal($(html).find('#edit_service_interface').val(), args.service.interface);
 });
 
 run_test('edit_embedded_bot_service', () => {
-    var args = {
+    let args = {
         service: {service_name: "giphy",
                   config_data: {key: "abcd1234"}},
     };
-    var html = render('edit-embedded-bot-service', args);
+    let html = render('edit-embedded-bot-service', args);
     assert.equal($(html).find('#embedded_bot_key_edit').attr('name'), 'key');
     assert.equal($(html).find('#embedded_bot_key_edit').val(), 'abcd1234');
 });
@@ -1611,12 +1611,12 @@ run_test('archive_message_group', () => {
     // to be included in a test case and really comes pre rendered from the backend
     // we just kinda test out the template part which is rendered on frontend with
     // some self made html for messages to insert into the handlebars.
-    var messages = [
+    let messages = [
         '<p>This is message one.</p>',
         '<p>This is message two.</p>',
     ];
 
-    var groups = [
+    let groups = [
         {
             display_recipient: "support",
             message_containers: messages,
@@ -1625,12 +1625,12 @@ run_test('archive_message_group', () => {
         },
     ];
 
-    var html = render('archive_message_group', {message_groups: groups});
+    let html = render('archive_message_group', {message_groups: groups});
 
-    var first_message_text = $(html).next('.recipient_row').find('p').first().text().trim();
+    let first_message_text = $(html).next('.recipient_row').find('p').first().text().trim();
     assert.equal(first_message_text, "This is message one.");
 
-    var last_message_text = $(html).next('.recipient_row').find('p').last().text().trim();
+    let last_message_text = $(html).next('.recipient_row').find('p').last().text().trim();
     assert.equal(last_message_text, 'This is message two.');
 
 });
