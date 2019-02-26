@@ -21,7 +21,7 @@ i18n.init({
 });
 
 run_test('t_tag', () => {
-    var args = {
+    let args = {
         message: {
             is_stream: true,
             id: "99",
@@ -35,12 +35,12 @@ run_test('t_tag', () => {
         narrowed: true,
     };
 
-    var html = global.render_template('actions_popover_content', args);
-    assert(html.indexOf("French translation") > 0);
+    let html = global.render_template('actions_popover_content', args);
+    assert(html.includes("French translation"));
 });
 
 run_test('tr_tag', () => {
-    var args = {
+    let args = {
         page_params: {
             full_name: "John Doe",
             password_auth_enabled: false,
@@ -59,6 +59,6 @@ run_test('tr_tag', () => {
         },
     };
 
-    var html = global.render_template('settings_tab', args);
-    assert(html.indexOf('Some French text with Zulip') > 0);
+    let html = global.render_template('settings_tab', args);
+    assert(html.includes('Some French text with Zulip'));
 });
