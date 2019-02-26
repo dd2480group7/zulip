@@ -1,7 +1,7 @@
 set_global('$', global.make_zjquery());
 set_global('blueslip', global.make_zblueslip());
 
-var filter_key_handlers;
+let filter_key_handlers;
 
 const _page_params = {
     realm_users: [],
@@ -283,7 +283,7 @@ run_test('huddle_fraction_present', () => {
     let huddle = 'alice@zulip.com,fred@zulip.com,jill@zulip.com,mark@zulip.com';
     huddle = people.emails_strings_to_user_ids_string(huddle);
 
-    var presence_info = {};
+    let presence_info = {};
     presence_info[alice.user_id] = { status: 'active' }; // counts as present
     presence_info[fred.user_id] = { status: 'idle' }; // doest not count as present
     // jill not in list
@@ -340,7 +340,7 @@ run_test('presence_list_full_update', () => {
     compose_state.recipient = () => fred.email;
     compose_fade.set_focused_recipient("private");
 
-    var user_ids = activity.build_user_sidebar();
+    let user_ids = activity.build_user_sidebar();
 
     user_ids = _.map(user_ids, function (user_id) {
         return parseInt(user_id, 10);
@@ -483,7 +483,7 @@ run_test('handlers', () => {
 
     (function test_enter_key() {
         init();
-        var narrowed;
+        let narrowed;
 
         narrow.by = (method, email) => {
             assert.equal(email, 'alice@zulip.com');
@@ -505,7 +505,7 @@ run_test('handlers', () => {
         init();
         // We wire up the click handler in click_handlers.js,
         // so this just tests the called function.
-        var narrowed;
+        let narrowed;
 
         narrow.by = (method, email) => {
             assert.equal(email, 'alice@zulip.com');
@@ -561,12 +561,12 @@ run_test('filter_user_ids', () => {
     user_filter.val(''); // no search filter
 
     function get_user_ids() {
-        var filter_text = activity.get_filter_text();
-        var user_ids = buddy_data.get_filtered_and_sorted_user_ids(filter_text);
+        const filter_text = activity.get_filter_text();
+        let user_ids = buddy_data.get_filtered_and_sorted_user_ids(filter_text);
         return user_ids;
     }
 
-    var user_ids = buddy_data.get_filtered_and_sorted_user_ids();
+    let user_ids = buddy_data.get_filtered_and_sorted_user_ids();
     assert.deepEqual(user_ids, [
         alice.user_id,
         fred.user_id,
@@ -611,8 +611,8 @@ run_test('insert_one_user_into_empty_list', () => {
 
     clear_buddy_list();
     activity.redraw_user(alice.user_id);
-    assert(appended_html.indexOf('data-user-id="1"') > 0);
-    assert(appended_html.indexOf('user_circle_green') > 0);
+    assert(appended_html.includes('data-user-id="1"'));
+    assert(appended_html.includes('user_circle_green'));
 });
 
 reset_setup();
@@ -626,12 +626,12 @@ run_test('insert_alice_then_fred', () => {
     };
 
     activity.redraw_user(alice.user_id);
-    assert(appended_html.indexOf('data-user-id="1"') > 0);
-    assert(appended_html.indexOf('user_circle_green') > 0);
+    assert(appended_html.includes('data-user-id="1"'));
+    assert(appended_html.includes('user_circle_green'));
 
     activity.redraw_user(fred.user_id);
-    assert(appended_html.indexOf('data-user-id="2"') > 0);
-    assert(appended_html.indexOf('user_circle_green') > 0);
+    assert(appended_html.includes('data-user-id="2"'));
+    assert(appended_html.includes('user_circle_green'));
 });
 
 reset_setup();
@@ -645,20 +645,20 @@ run_test('insert_fred_then_alice_then_rename', () => {
     };
 
     activity.redraw_user(fred.user_id);
-    assert(appended_html.indexOf('data-user-id="2"') > 0);
-    assert(appended_html.indexOf('user_circle_green') > 0);
+    assert(appended_html.includes('data-user-id="2"'));
+    assert(appended_html.includes('user_circle_green'));
 
-    var fred_stub = $.create('fred-first');
+    let fred_stub = $.create('fred-first');
     buddy_list_add(fred.user_id, fred_stub);
 
-    var inserted_html;
+    let inserted_html;
     fred_stub.before = (html) => {
         inserted_html = html;
     };
 
     activity.redraw_user(alice.user_id);
-    assert(inserted_html.indexOf('data-user-id="1"') > 0);
-    assert(inserted_html.indexOf('user_circle_green') > 0);
+    assert(inserted_html.includes('data-user-id="1"'));
+    assert(inserted_html.includes('user_circle_green'));
 
     // Next rename fred to Aaron.
     const fred_with_new_name = {
@@ -668,7 +668,7 @@ run_test('insert_fred_then_alice_then_rename', () => {
     };
     people.add(fred_with_new_name);
 
-    var alice_stub = $.create('alice-first');
+    let alice_stub = $.create('alice-first');
     buddy_list_add(alice.user_id, alice_stub);
 
     alice_stub.before = (html) => {
@@ -676,7 +676,7 @@ run_test('insert_fred_then_alice_then_rename', () => {
     };
 
     activity.redraw_user(fred_with_new_name.user_id);
-    assert(appended_html.indexOf('data-user-id="2"') > 0);
+    assert(appended_html.includes('data-user-id="2"'));
 
     // restore old Fred data
     people.add(fred);
@@ -757,8 +757,8 @@ run_test('searching', () => {
 run_test('update_huddles_and_redraw', () => {
     const value = $.create('alice-fred-value');
     const count = $.create('alice-fred-count');
-    const pm_key = alice.user_id.toString() + "," + fred.user_id.toString();
-    const li_selector = "li.group-pms-sidebar-entry[data-user-ids='" + pm_key + "']";
+    const pm_key = `${alice.user_id.toString()},${fred.user_id.toString()}`;
+    const li_selector = `li.group-pms-sidebar-entry[data-user-ids='${pm_key}']`;
     const li = $(li_selector);
     count.set_find_results('.value', value);
     li.set_find_results('.count', count);
@@ -795,7 +795,7 @@ run_test('update_presence_info', () => {
     const alice_li = $.create('alice stub');
     buddy_list_add(alice.user_id, alice_li);
 
-    var inserted;
+    let inserted;
     buddy_list.insert_or_move = () => {
         inserted = true;
     };
@@ -837,7 +837,7 @@ run_test('initialize', () => {
         check_for_unsuspend: function () {},
     };
 
-    var scroll_handler_started;
+    let scroll_handler_started;
     buddy_list.start_scroll_handler = () => {
         scroll_handler_started = true;
     };
